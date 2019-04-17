@@ -3,14 +3,14 @@
         <div class="vuest">
           <v-select  v-model="types" :options="setTypes" label="name">
             </v-select>
-        <VueHotelDatepicker  v-model="dates" minDate="2018-10-10" @update="getDates"/>
-            <button @click="getValueAll" class="btn btn-default">Общие просмотры</button>
+        <VueHotelDatepicker v-if="boolDate"  v-model="dates" minDate="2018-10-10" @update="getDates"/>
+            <button v-if="boolDate" @click="getValueAll" class="btn btn-default">Общие просмотры</button>
         </div>
-        <v-select  v-model="id" :options="setData" label="name">
+        <v-select v-if='boolData'  v-model="id" :options="setData" label="name">
         </v-select>
-         <v-select v-if="status"  v-model="idSeries" :options="valueSeries" label="name">
+         <v-select v-if="boolSeries"  v-model="idSeries" :options="valueSeries" label="name">
         </v-select>
-        <div ref="chart" class="char"></div>
+        <div  ref="chart" class="char"></div>
     </div>
 </template>
 
@@ -26,8 +26,11 @@
         data(){
             return {
                 setData:[],id: '',
+                boolData:false,
+                boolDate:false,
+                boolSeries:false,
+                //boolGraph:false,
                 valueSeries : [],
-                status: false,
                 idSeries :'',
                 dates:{},
                 status1:false,
@@ -52,7 +55,7 @@
                     })
                     .then((json) => {
                         this.valueSeries = json;
-                        this.status = true;
+                        this.boolSeries=true;
                     })
                     .catch((error) => {
                         console.log(error);
@@ -86,6 +89,7 @@
                     })
                     .then((json) => {
                         this.valueSeries = json;
+
                         this.getGraph(json);
 
                     })
@@ -99,9 +103,11 @@
                 this.dates.end+="%200";
                 this.dates.start=this.dates.start.split("/").join("-");
                 this.dates.end=this.dates.end.split("/").join("-");
-                console.log(this.dates)
+                console.log(this.dates);
+                this.boolData=true;
             },
             getGraph(json) {
+              //  this.boolGraph=true;
                 var chart = am4core.create(this.$refs.chart, am4charts.XYChart);
                 chart.paddingRight = 20;
 
@@ -161,6 +167,7 @@
                     })
                     .then((json) =>{
                         this.setData=json;
+                        this.boolDate=true;
                     })
                     .catch((error) => {
                         console.log(error);
@@ -175,8 +182,12 @@
                 this.getValueGraph();
             },
             types:function()
-            {
+            { this.boolData=false;
+              this.boolDate=false;
+              this.boolSeries=false;
+            //  this.boolGraph=false;
               this.getStart();
+
             }
         }
 
